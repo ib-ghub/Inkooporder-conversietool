@@ -110,7 +110,7 @@
       wijzigBtn.style.display = "inline-block";
     } else {
       el.textContent = "Niet gekoppeld — bewaar hieronder een repository + sleutel om automatisch te publiceren.";
-      if (btn) btn.textContent = "Converteren en downloaden";
+      if (btn) btn.textContent = "Converteren en uploaden";
       editForm.classList.remove("hidden");
       wijzigBtn.style.display = "none";
     }
