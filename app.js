@@ -261,7 +261,6 @@
         "Totaal aantal in basiseenheid",
       ];
       const outRows = [outHeader];
-      const nietGevondenRowIdx = [];
 
       for (let r = 1; r < aoa.length; r++) {
         const row = aoa[r];
@@ -277,8 +276,7 @@
           if (dcNr) {
             gevonden++;
           } else {
-            mismatches.push({ rij: r + 1, nr: nrRaw, omschrijving: getStr(row, colOms) });
-            nietGevondenRowIdx.push(outRows.length);
+            mismatches.push({ rij: r + 1, nr: nrRaw, omschrijving: getStr(row, colOms), outRowIdx: outRows.length });
           }
         }
 
@@ -297,8 +295,8 @@
       }
 
       const wsOut = XLSX.utils.aoa_to_sheet(outRows);
-      nietGevondenRowIdx.forEach((r) => {
-        const addr = XLSX.utils.encode_cell({ r, c: 2 });
+      mismatches.forEach((m) => {
+        const addr = XLSX.utils.encode_cell({ r: m.outRowIdx, c: 2 });
         wsOut[addr] = { t: "s", v: "", s: RED_FILL };
       });
       wsOut["!cols"] = outHeader.map((_, c) => {
@@ -321,7 +319,7 @@
       if (mismatches.length) {
         mismatches.forEach((m) => {
           const tr = document.createElement("tr");
-          tr.innerHTML = `<td>${m.rij}</td><td>${m.nr}</td><td>${m.omschrijving}</td>`;
+          tr.innerHTML = `<td>${m.rij}</td><td>${m.nr}</td><td>${m.omschrijving}</td><td><input type="text" class="text-input mismatch-input" data-outrow="${m.outRowIdx}" placeholder="DC-nummer"></td>`;
           mismatchBody.appendChild(tr);
         });
         mismatchWrap.classList.remove("hidden");
@@ -340,6 +338,13 @@
 
   document.getElementById("downloadBtn").addEventListener("click", () => {
     if (!lastWorkbook) return;
+    const ws = lastWorkbook.Sheets["Regels"];
+    document.querySelectorAll(".mismatch-input").forEach((input) => {
+      const value = input.value.trim();
+      if (!value) return;
+      const addr = XLSX.utils.encode_cell({ r: parseInt(input.dataset.outrow, 10), c: 2 });
+      ws[addr] = { t: "s", v: value };
+    });
     XLSX.writeFile(lastWorkbook, lastFilename, { cellStyles: true });
   });
 
