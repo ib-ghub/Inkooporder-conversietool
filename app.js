@@ -105,12 +105,12 @@
     if (cfg) {
       el.textContent = `Gekoppeld aan repository ${cfg.repo}. Publiceren gaat automatisch.`;
       document.getElementById("githubRepoInput").value = cfg.repo;
-      if (btn) btn.textContent = "Converteren en publiceren";
+      if (btn) btn.textContent = "Uploaden";
       editForm.classList.add("hidden");
       wijzigBtn.style.display = "inline-block";
     } else {
       el.textContent = "Niet gekoppeld — bewaar hieronder een repository + sleutel om automatisch te publiceren.";
-      if (btn) btn.textContent = "Converteren en uploaden";
+      if (btn) btn.textContent = "Uploaden";
       editForm.classList.remove("hidden");
       wijzigBtn.style.display = "none";
     }
