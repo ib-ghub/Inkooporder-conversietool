@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Inkooporder → DC-nummer</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header>
+  <h1>Inkooporder → DC-nummer</h1>
+</header>
+
+<main>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="verwerken">Inkooporder verwerken</button>
+    <button class="tab-btn" data-tab="beheren">Referentietabel beheren</button>
+  </div>
+
+  <!-- ===== Tab: verwerken ===== -->
+  <section id="panel-verwerken">
+    <div class="card">
+      <h2>Inkooporder verwerken</h2>
+      <p class="hint">
+        Upload de inkooporder-export uit Business Central. De tool zoekt per artikelregel het
+        Oosterberg-artikelnummer op en levert een opgeschoond bestand op met de juiste kolommen
+        voor het DC, inclusief een berekende kolom "Totaal aantal in basiseenheid".
+      </p>
+      <p class="meta-line ref-meta">Referentietabel laden…</p>
+
+      <div class="dropzone" id="orderZone">
+        <input type="file" id="orderInput" accept=".xlsx" />
+        <div>Klik of sleep hier de inkooporder-Excel</div>
+        <div class="filename" id="orderFilename"></div>
+      </div>
+
+      <button class="btn btn-primary" id="verwerkBtn" disabled>Verwerken</button>
+      <div class="status" id="verwerkStatus"></div>
+
+      <div id="verwerkResultaat" class="hidden">
+        <div class="summary">
+          <div class="stat">
+            <div class="num" id="statTotaal">0</div>
+            <div class="lbl">Artikelregels</div>
+          </div>
+          <div class="stat ok">
+            <div class="num" id="statGevonden">0</div>
+            <div class="lbl">Gevonden</div>
+          </div>
+          <div class="stat warn">
+            <div class="num" id="statNietGevonden">0</div>
+            <div class="lbl">Niet gevonden</div>
+          </div>
+        </div>
+
+        <div id="mismatchWrap" class="hidden">
+          <table class="mismatch">
+            <thead><tr><th>Rij</th><th>Artikelnr.</th><th>Omschrijving</th></tr></thead>
+            <tbody id="mismatchBody"></tbody>
+          </table>
+          <p class="hint" style="margin-top:10px;">
+            Deze regels zijn rood gemarkeerd in het gedownloade bestand — vul het DC-nummer hier
+            handmatig aan voordat je de order naar het DC stuurt.
+          </p>
+        </div>
+
+        <button class="btn btn-outline" id="downloadBtn">Download bestand voor DC</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Tab: beheren ===== -->
+  <section id="panel-beheren" class="hidden">
+    <div class="card">
+      <h2>GitHub-koppeling</h2>
+      <p class="hint">
+        Eenmalig instellen. Hiermee kan de tool de referentietabel rechtstreeks publiceren,
+        zonder dat je zelf iets hoeft te downloaden of te uploaden. De sleutel wordt alleen in
+        déze browser bewaard.
+      </p>
+      <p class="meta-line" id="githubStatusLine">Niet gekoppeld.</p>
+      <button class="btn btn-outline" id="githubWijzigBtn" style="display:none;">Wijzigen</button>
+
+      <div id="githubEditForm">
+        <label class="field-label" for="githubRepoInput">Repository (eigenaar/naam)</label>
+        <input type="text" id="githubRepoInput" class="text-input" placeholder="bv. Nielskeehh/inkooporder-dc-tool" />
+
+        <label class="field-label" for="githubTokenInput">Persoonlijke toegangssleutel (fine-grained token)</label>
+        <input type="password" id="githubTokenInput" class="text-input" placeholder="github_pat_..." autocomplete="off" />
+        <p class="hint" style="margin-top:6px;">
+          Aanmaken: GitHub → profielfoto → Settings → Developer settings → Personal access tokens →
+          Fine-grained tokens → Generate new token. Kies bij "Repository access" alleen deze ene
+          repository, en zet bij "Permissions → Contents" op "Read and write".
+        </p>
+
+        <button class="btn btn-primary" id="githubSaveBtn">Koppeling opslaan</button>
+        <button class="btn btn-outline" id="githubClearBtn" style="margin-top:8px;">Loskoppelen</button>
+      </div>
+      <div class="status" id="githubStatus"></div>
+    </div>
+
+    <div class="card">
+      <h2>Referentietabel beheren</h2>
+      <p class="hint">
+        Alleen nodig als artikelbeheerder. Upload hier de ruwe "Artikelreferentie"-export uit
+        Business Central. De tool haalt hieruit alleen de twee benodigde kolommen
+        (Installatiebalie-nummer en DC-nummer) en publiceert automatisch een klein bestandje
+        (<code>referentietabel.json</code>). Zodra dat gelukt is, gebruiken alle collega's binnen
+        enkele minuten automatisch de nieuwe versie.
+      </p>
+      <p class="meta-line ref-meta">Referentietabel laden…</p>
+
+      <div class="dropzone" id="refZone">
+        <input type="file" id="refInput" accept=".xlsx" />
+        <div>Klik of sleep hier de ruwe artikelreferentie-export</div>
+        <div class="filename" id="refFilename"></div>
+      </div>
+
+      <button class="btn btn-primary" id="converteerBtn">Converteren en publiceren</button>
+      <div class="status" id="refStatus"></div>
+
+      <div id="refResultaat" class="hidden">
+        <p class="meta-line"><span id="refAantal">0</span> koppelingen gevonden en verwerkt in het nieuwe bestand.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="xlsx.bundle.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
